@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lavandería Pro</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- FUENTE BONITA -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='ESMA.png') }}" class="ESMA">
+        <h1>Lavandería Pro</h1>
+        <h3>Escuela Superior Militar de Aviación</h3>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-box">
+        <form method="POST">
+            <input type="text" name="cliente" placeholder="Cliente" required>
+            <input type="number" step="0.01" name="peso" placeholder="Peso (kg)" required>
+            <input type="number" name="azul" placeholder="Azul Costa" value="0">
+            <input type="number" name="calzado" placeholder="Calzado" value="0">
+            <input type="number" name="otros" placeholder="Otros Uniformes" value="0">
+            <input type="date" name="fecha" required>
+
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-box">
+        <h2>Clientes</h2>
+
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Peso</th>
+                    <th>Azul</th>
+                    <th>Calzado</th>
+                    <th>Otros</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                    <th>Acción</th>
+                </tr>
+
+                {% for d in datos %}
+                <tr>
+                    <td>{{ d[1] }}</td>
+                    <td>{{ d[2] }}</td>
+                    <td>{{ d[3] }}</td>
+                    <td>{{ d[4] }}</td>
+                    <td>{{ d[5] }}</td>
+                    <td>${{ d[6] }}</td>
+                    <td>{{ d[7] }}</td>
+                    <td>
+                        <a href="/pagar/{{ d[1] }}" class="btn-pagar">💵</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

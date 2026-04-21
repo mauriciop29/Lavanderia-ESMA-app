@@ -1,0 +1,112 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    text-align: center;
+}
+
+/* HEADER */
+.header {
+    margin-top: 20px;
+    color: white;
+}
+
+.logo {
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    margin: 5px;
+    font-size: 36px;
+}
+
+.header h3 {
+    margin: 0;
+    font-weight: 300;
+}
+
+/* FORMULARIO */
+.form-box {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+}
+
+input {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+/* BOTÓN */
+button {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #1e3c72;
+}
+
+/* TABLA */
+.table-box {
+    background: white;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #2a5298;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* BOTÓN PAGAR */
+.btn-pagar {
+    text-decoration: none;
+    background: green;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.btn-pagar:hover {
+    background: darkgreen;
+}
