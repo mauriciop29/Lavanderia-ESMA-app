@@ -38,50 +38,57 @@ def index():
     c = conn.cursor()
 
     if request.method == "POST":
-        nombre = request.form["cliente"]
-        peso = float(request.form["peso"])
-        azul = int(request.form["azul"])
-        calzado = int(request.form["calzado"])
-        otros = int(request.form["otros"])
-        fecha = request.form["fecha"]
+    nombre = request.form["cliente"]
+    peso = float(request.form["peso"])
+    
+    # valores seguros (evita errores)
+    azul = int(request.form.get("azul", 0) or 0)
+    calzado = int(request.form.get("calzado", 0) or 0)
+    otros = int(request.form.get("otros", 0) or 0)
+    
+    fecha = request.form["fecha"]
 
-        # LIMITE
-        if peso > 100:
-            return "❌ No se permite más de 100"
+    # LIMITE
+    if peso > 100:
+        return "❌ No se permite más de 100"
 
-        # CALCULAR TOTAL NUEVO
-        total_nuevo = (
-            peso * precio_libra +
-            azul * precio_azulcosta +
-            calzado * precio_calzado +
-            otros * precio_otrosuniformes
-        )
+    # CALCULAR TOTAL
+    total_nuevo = (
+        peso * precio_libra +
+        azul * precio_azulcosta +
+        calzado * precio_calzado +
+        otros * precio_otrosuniformes
+    )
 
-        # BUSCAR CLIENTE
-        c.execute("SELECT peso, azul_costa, calzado, otros_uniformes, total FROM clientes WHERE nombre=?", (nombre,))
-        resultado = c.fetchone()
+    print("TOTAL CALCULADO:", total_nuevo)  # debug
 
-        if resultado:
-            nuevo_peso = resultado[0] + peso
-            nuevo_azul = resultado[1] + azul
-            nuevo_calzado = resultado[2] + calzado
-            nuevo_otros = resultado[3] + otros
-            nuevo_total = resultado[4] + total_nuevo
+    # BUSCAR CLIENTE
+    c.execute("SELECT peso, azul_costa, calzado, otros_uniformes, total FROM clientes WHERE nombre=?", (nombre,))
+    resultado = c.fetchone()
 
-            c.execute("""
-                UPDATE clientes 
-                SET peso=?, azul_costa=?, calzado=?, otros_uniformes=?, total=?, fecha=? 
-                WHERE nombre=?
-            """, (nuevo_peso, nuevo_azul, nuevo_calzado, nuevo_otros, nuevo_total, fecha, nombre))
+    if resultado:
+        nuevo_peso = resultado[0] + peso
+        nuevo_azul = resultado[1] + azul
+        nuevo_calzado = resultado[2] + calzado
+        nuevo_otros = resultado[3] + otros
+        nuevo_total = resultado[4] + total_nuevo
 
-        else:
-            c.execute("""
-                INSERT INTO clientes (nombre, peso, azul_costa, calzado, otros_uniformes, total, fecha)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (nombre, peso, azul, calzado, otros, total_nuevo, fecha))
+        c.execute("""
+            UPDATE clientes 
+            SET peso=?, azul_costa=?, calzado=?, otros_uniformes=?, total=?, fecha=? 
+            WHERE nombre=?
+        """, (nuevo_peso, nuevo_azul, nuevo_calzado, nuevo_otros, nuevo_total, fecha, nombre))
 
-        conn.commit()
+    else:
+        c.execute("""
+            INSERT INTO clientes (nombre, peso, azul_costa, calzado, otros_uniformes, total, fecha)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (nombre, peso, azul, calzado, otros, total_nuevo, fecha))
 
+    conn.commit()
+
+    # 🔥 MENSAJE PRO
+    return f"✅ Cliente registrado. Total a pagar: ${round(total_nuevo, 2)}"
     c.execute("SELECT * FROM clientes")
     datos = c.fetchall()
     conn.close()
@@ -107,4 +114,4 @@ def pagar(nombre):
 
 # ================= RUN =================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
