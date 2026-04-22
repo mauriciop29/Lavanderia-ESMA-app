@@ -1,83 +1,73 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #1e3c72, #2a5298);
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     margin: 0;
     padding: 0;
     color: #333;
 }
 
-/* CONTENEDOR PRINCIPAL */
 .container {
-    width: 90%;
-    max-width: 1200px;
+    width: 85%;
     margin: auto;
-    text-align: center;
+    padding: 20px;
 }
 
 /* HEADER */
 .header {
-    margin-top: 20px;
+    text-align: center;
     color: white;
-}
-
-.logo {
-    width: 80px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .header h1 {
-    margin: 5px;
-    font-size: 36px;
+    font-size: 40px;
+    margin: 10px 0;
 }
 
 .header h3 {
-    margin: 0;
     font-weight: 300;
+    margin: 0;
 }
 
-/* FORMULARIO */
-.form-box {
+.ESMA {
+    width: 90px;
+}
+
+/* CAJAS */
+.form-box, .table-box {
     background: white;
     padding: 20px;
-    border-radius: 15px;
-    margin-top: 20px;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+    margin: 20px 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
+/* INPUTS */
 input {
-    display: block;
-    width: 80%;
-    margin: 10px auto;
-    padding: 12px;
+    width: 18%;
+    padding: 10px;
+    margin: 5px;
     border-radius: 8px;
     border: 1px solid #ccc;
-    font-size: 15px;
+    font-size: 14px;
 }
 
-/* BOTÓN */
+/* BOTONES */
 button {
-    background: #2a5298;
+    padding: 10px 20px;
+    background: #007BFF;
     color: white;
     border: none;
-    padding: 12px 25px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
+    transition: 0.3s;
 }
 
 button:hover {
-    background: #1e3c72;
+    background: #0056b3;
 }
 
 /* TABLA */
-.table-box {
-    background: white;
-    margin-top: 20px;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
-}
-
 .table-container {
     overflow-x: auto;
 }
@@ -85,10 +75,11 @@ button:hover {
 table {
     width: 100%;
     border-collapse: collapse;
+    text-align: center;
 }
 
 th {
-    background: #2a5298;
+    background: #007BFF;
     color: white;
     padding: 12px;
 }
@@ -98,15 +89,24 @@ td {
     border-bottom: 1px solid #ddd;
 }
 
-/* BOTÓN PAGAR */
+tr:hover {
+    background: #f1f1f1;
+}
+
+/* BOTON PAGAR */
 .btn-pagar {
-    text-decoration: none;
-    background: green;
-    color: white;
-    padding: 6px 12px;
+    background: #28a745;
+    padding: 6px 10px;
     border-radius: 6px;
+    color: white;
+    text-decoration: none;
 }
 
 .btn-pagar:hover {
-    background: darkgreen;
+    background: #1e7e34;
+}
+
+/* GRAFICO */
+canvas {
+    margin-top: 20px;
 }
