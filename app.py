@@ -34,27 +34,48 @@ def init_db():
 init_db()
 
 # ================= EMAIL =================
-def enviar_email(destino, nombre, total, fecha):
+def enviar_email(destino, nombre, total_dia, total_acumulado, fecha):
 
     html = f"""
     <html>
     <body style="font-family:Poppins;background:#f4f6f8;padding:20px;">
-        <div style="max-width:500px;margin:auto;background:white;padding:25px;border-radius:12px;">
-            <h2 style="color:#007BFF;text-align:center;">Lavandería ESMA ✈️</h2>
-            <p>Hola <b>{nombre}</b>,</p>
-            <p>Tu ropa ha sido registrada correctamente.</p>
+        
+        <div style="max-width:500px;margin:auto;background:white;padding:25px;border-radius:15px;box-shadow:0 8px 25px rgba(0,0,0,0.15);">
 
-            <div style="background:#f1f1f1;padding:15px;border-radius:10px;">
-                <p><b>Total:</b> ${round(total,2)}</p>
-                <p><b>Fecha:</b> {fecha}</p>
+            <h2 style="color:#007BFF;text-align:center;">Lavandería ESMA ✈️</h2>
+
+            <p style="font-size:16px;">Hola <b>{nombre}</b> 👋</p>
+
+            <p>Tu ropa fue registrada correctamente.</p>
+
+            <div style="background:#f1f1f1;padding:15px;border-radius:10px;margin:15px 0;">
+                <p><b>📅 Fecha:</b> {fecha}</p>
             </div>
 
-            <p style="text-align:center;">Gracias por confiar en nosotros</p>
+            <div style="display:flex;justify-content:space-between;margin:15px 0;">
+                
+                <div style="background:#007BFF;color:white;padding:15px;border-radius:10px;width:48%;text-align:center;">
+                    <p style="margin:0;">Hoy</p>
+                    <h3 style="margin:5px 0;">${round(total_dia,2)}</h3>
+                </div>
+
+                <div style="background:#28a745;color:white;padding:15px;border-radius:10px;width:48%;text-align:center;">
+                    <p style="margin:0;">Acumulado</p>
+                    <h3 style="margin:5px 0;">${round(total_acumulado,2)}</h3>
+                </div>
+
+            </div>
+
+            <p style="text-align:center;margin-top:20px;">
+                Gracias por confiar en nosotros ✈️
+            </p>
+
         </div>
+
     </body>
     </html>
     """
-
+    
     msg = MIMEMultipart()
     msg["Subject"] = "Lavandería ESMA - Registro"
     msg["From"] = EMAIL_USER
@@ -89,13 +110,14 @@ def index():
         otros = int(request.form.get("otros", 0))
         fecha = request.form["fecha"]
 
-        total = round(
-          peso * precio_libra +
-          azul * precio_azulcosta +
-          calzado * precio_calzado +
-          otros * precio_otrosuniformes,
-          2
+        total_dia = round(
+            peso * precio_libra +
+            azul * precio_azulcosta +
+            calzado * precio_calzado +
+            otros * precio_otrosuniformes,
+            2
         )
+
         # 🔍 BUSCAR CLIENTE
         c.execute("SELECT correo FROM clientes WHERE nombre=?", (nombre,))
         resultado = c.fetchone()
@@ -112,7 +134,7 @@ def index():
                     total = total + ?, 
                     fecha = ?
                 WHERE nombre = ?
-            """, (peso, azul, calzado, otros, total, fecha, nombre))
+            """, (peso, azul, calzado, otros, total_dia, fecha, nombre))
 
         else:
             correo_guardado = correo_input
@@ -121,12 +143,16 @@ def index():
                 INSERT INTO clientes 
                 (nombre, correo, peso, azul_costa, calzado, otros_uniformes, total, fecha)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (nombre, correo_input, peso, azul, calzado, otros, total, fecha))
+            """, (nombre, correo_input, peso, azul, calzado, otros, total_dia, fecha))
 
         conn.commit()
 
-        # 📧 ENVIAR EMAIL
-        enviar_email(correo_guardado, nombre, total, fecha)
+        # 🔥 TOTAL ACUMULADO
+        c.execute("SELECT total FROM clientes WHERE nombre=?", (nombre,))
+        total_acumulado = c.fetchone()[0]
+
+        # 📧 EMAIL
+        enviar_email(correo_guardado, nombre, total_dia, total_acumulado, fecha)
 
     # 🔍 BUSCADOR
     buscar = request.args.get("buscar")
@@ -147,7 +173,7 @@ def index():
     stats = c.fetchall()
 
     meses = [row[0] for row in stats]
-    totales = [row[1] for row in stats]
+    totales = [round(row[1],2) for row in stats]
 
     conn.close()
 
