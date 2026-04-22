@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 import sqlite3
 import smtplib
 import os
@@ -7,11 +7,10 @@ from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
-# VARIABLES DE ENTORNO (RENDER)
 EMAIL_USER = os.environ.get("EMAIL_USER")
 EMAIL_PASS = os.environ.get("EMAIL_PASS")
 
-# ================= BASE DE DATOS =================
+# ================= DB =================
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -44,38 +43,33 @@ def enviar_email(destino, nombre, total_dia, total_acumulado, fecha):
 
             <h2 style="color:#007BFF;text-align:center;">Lavandería ESMA ✈️</h2>
 
-            <p style="font-size:16px;">Hola <b>{nombre}</b> 👋</p>
+            <p>Hola <b>{nombre}</b> 👋</p>
 
-            <p>Tu ropa fue registrada correctamente.</p>
-
-            <div style="background:#f1f1f1;padding:15px;border-radius:10px;margin:15px 0;">
-                <p><b>📅 Fecha:</b> {fecha}</p>
+            <div style="background:#f1f1f1;padding:15px;border-radius:10px;">
+                <p><b>Fecha:</b> {fecha}</p>
             </div>
 
-            <div style="display:flex;justify-content:space-between;margin:15px 0;">
+            <div style="display:flex;justify-content:space-between;margin:20px 0;">
                 
                 <div style="background:#007BFF;color:white;padding:15px;border-radius:10px;width:48%;text-align:center;">
-                    <p style="margin:0;">Hoy</p>
-                    <h3 style="margin:5px 0;">${round(total_dia,2)}</h3>
+                    <p>Hoy</p>
+                    <h3>${round(total_dia,2)}</h3>
                 </div>
 
                 <div style="background:#28a745;color:white;padding:15px;border-radius:10px;width:48%;text-align:center;">
-                    <p style="margin:0;">Acumulado</p>
-                    <h3 style="margin:5px 0;">${round(total_acumulado,2)}</h3>
+                    <p>Acumulado</p>
+                    <h3>${round(total_acumulado,2)}</h3>
                 </div>
 
             </div>
 
-            <p style="text-align:center;margin-top:20px;">
-                Gracias por confiar en nosotros ✈️
-            </p>
+            <p style="text-align:center;">Gracias por confiar en nosotros ✈️</p>
 
         </div>
-
     </body>
     </html>
     """
-    
+
     msg = MIMEMultipart()
     msg["Subject"] = "Lavandería ESMA - Registro"
     msg["From"] = EMAIL_USER
@@ -89,7 +83,23 @@ def enviar_email(destino, nombre, total_dia, total_acumulado, fecha):
     server.send_message(msg)
     server.quit()
 
-# ================= PRINCIPAL =================
+# ================= AUTOCOMPLETE =================
+@app.route("/get_cliente/<nombre>")
+def get_cliente(nombre):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+
+    c.execute("SELECT correo FROM clientes WHERE nombre=?", (nombre,))
+    resultado = c.fetchone()
+
+    conn.close()
+
+    if resultado:
+        return jsonify({"correo": resultado[0]})
+    else:
+        return jsonify({"correo": ""})
+
+# ================= MAIN =================
 @app.route("/", methods=["GET", "POST"])
 def index():
 
@@ -118,7 +128,6 @@ def index():
             2
         )
 
-        # 🔍 BUSCAR CLIENTE
         c.execute("SELECT correo FROM clientes WHERE nombre=?", (nombre,))
         resultado = c.fetchone()
 
@@ -147,24 +156,20 @@ def index():
 
         conn.commit()
 
-        # 🔥 TOTAL ACUMULADO
         c.execute("SELECT total FROM clientes WHERE nombre=?", (nombre,))
         total_acumulado = c.fetchone()[0]
 
-        # 📧 EMAIL
         enviar_email(correo_guardado, nombre, total_dia, total_acumulado, fecha)
 
-    # 🔍 BUSCADOR
     buscar = request.args.get("buscar")
 
     if buscar:
-        c.execute("SELECT * FROM clientes WHERE nombre LIKE ? ORDER BY fecha DESC", (f"%{buscar}%",))
+        c.execute("SELECT * FROM clientes WHERE nombre LIKE ?", (f"%{buscar}%",))
     else:
-        c.execute("SELECT * FROM clientes ORDER BY fecha DESC")
+        c.execute("SELECT * FROM clientes")
 
     datos = c.fetchall()
 
-    # 📊 ESTADISTICAS
     c.execute("""
         SELECT substr(fecha,1,7), SUM(total)
         FROM clientes

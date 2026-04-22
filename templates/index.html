@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lavandería</title>
+    <title>Lavandería ESMA</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- FUENTE BONITA -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-    <!-- GRAFICO -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -17,18 +14,17 @@
 
 <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
         <img src="{{ url_for('static', filename='ESMA.png') }}" class="ESMA">
         <h1>Lavandería ESMA</h1>
         <h3>Escuela Superior Militar de Aviación</h3>
     </div>
 
-    <!-- FORMULARIO -->
+    <!-- FORM -->
     <div class="form-box">
         <form method="POST">
             <input type="text" name="cliente" placeholder="Cliente" required>
-            <input type="email" name="correo" placeholder="Correo del cliente" required>
+            <input type="email" name="correo" placeholder="Correo" required>
             <input type="number" step="0.01" name="peso" placeholder="Peso (kg)" required>
 
             <input type="number" name="azul" placeholder="Azul Costa" value="0">
@@ -53,38 +49,34 @@
     <div class="table-box">
         <h2>Clientes</h2>
 
-        <div class="table-container">
-            <table>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Peso</th>
-                    <th>Azul</th>
-                    <th>Calzado</th>
-                    <th>Otros</th>
-                    <th>Total</th>
-                    <th>Fecha</th>
-                    <th>Acción</th>
-                </tr>
+        <table>
+            <tr>
+                <th>Cliente</th>
+                <th>Peso</th>
+                <th>Azul</th>
+                <th>Calzado</th>
+                <th>Otros</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Acción</th>
+            </tr>
 
-                {% for d in datos %}
-                <tr>
-                    <td>{{ d[1] }}</td>
-                    <td>{{ d[3] }}</td>
-                    <td>{{ d[4] }}</td>
-                    <td>{{ d[5] }}</td>
-                    <td>{{ d[6] }}</td>
-                    <td>${{ "%.2f"|format(d[7]) }}</td>
-                    <td>{{ d[8] }}</td>
-                    <td>
-                        <a href="/pagar/{{ d[0] }}" class="btn-pagar">💵</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
+            {% for d in datos %}
+            <tr>
+                <td>{{ d[1] }}</td>
+                <td>{{ d[3] }}</td>
+                <td>{{ d[4] }}</td>
+                <td>{{ d[5] }}</td>
+                <td>{{ d[6] }}</td>
+                <td>${{ "%.2f"|format(d[7]) }}</td>
+                <td>{{ d[8] }}</td>
+                <td><a href="/pagar/{{ d[0] }}" class="btn-pagar">💵</a></td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
-    <!-- 📊 GRAFICO -->
+    <!-- GRAFICO -->
     <div class="table-box">
         <h2>Ingresos Mensuales</h2>
         <canvas id="grafico"></canvas>
@@ -93,14 +85,28 @@
 </div>
 
 <script>
-const ctx = document.getElementById('grafico');
+const clienteInput = document.querySelector("input[name='cliente']");
+const correoInput = document.querySelector("input[name='correo']");
 
-new Chart(ctx, {
+clienteInput.addEventListener("blur", function() {
+    let nombre = clienteInput.value;
+
+    fetch(`/get_cliente/${nombre}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.correo) {
+            correoInput.value = data.correo;
+        }
+    });
+});
+
+// GRAFICO
+new Chart(document.getElementById('grafico'), {
     type: 'bar',
     data: {
         labels: {{ meses | safe }},
         datasets: [{
-            label: 'Ingresos ($)',
+            label: 'Ingresos',
             data: {{ totales | safe }}
         }]
     }
