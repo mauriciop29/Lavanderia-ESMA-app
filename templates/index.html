@@ -6,8 +6,11 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- FUENTE BONITA -->
+    <!-- FUENTE -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- CHART -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -17,7 +20,7 @@
     <!-- HEADER -->
     <div class="header">
         <img src="{{ url_for('static', filename='ESMA.png') }}" class="ESMA">
-        <h1>Lavandería Pro</h1>
+        <h1>Lavandería</h1>
         <h3>Escuela Superior Militar de Aviación</h3>
     </div>
 
@@ -35,9 +38,17 @@
         </form>
     </div>
 
+    <!-- 🔍 BUSCADOR -->
+    <div class="form-box">
+        <form method="GET">
+            <input type="text" name="buscar" placeholder="Buscar cliente">
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
+
     <!-- TABLA -->
     <div class="table-box">
-        <h2>Clientes</h2>
+        <h2>Historial de Clientes</h2>
 
         <div class="table-container">
             <table>
@@ -62,7 +73,8 @@
                     <td>${{ d[6] }}</td>
                     <td>{{ d[7] }}</td>
                     <td>
-                        <a href="/pagar/{{ d[1] }}" class="btn-pagar">💵</a>
+                        <!-- 🔥 CORREGIDO: ahora usa ID -->
+                        <a href="/pagar/{{ d[0] }}" class="btn-pagar">💵</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -70,7 +82,29 @@
         </div>
     </div>
 
+    <!-- 📊 GRÁFICO -->
+    <div class="table-box">
+        <h2>Estadísticas Mensuales</h2>
+        <canvas id="grafico"></canvas>
+    </div>
+
 </div>
+
+<!-- SCRIPT GRAFICO -->
+<script>
+const ctx = document.getElementById('grafico');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ meses | safe }},
+        datasets: [{
+            label: 'Ingresos por mes ($)',
+            data: {{ totales | safe }}
+        }]
+    }
+});
+</script>
 
 </body>
 </html>
