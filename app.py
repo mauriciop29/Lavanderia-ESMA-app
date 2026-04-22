@@ -89,13 +89,13 @@ def index():
         otros = int(request.form.get("otros", 0))
         fecha = request.form["fecha"]
 
-        total = (
-            peso * precio_libra +
-            azul * precio_azulcosta +
-            calzado * precio_calzado +
-            otros * precio_otrosuniformes
+        total = round(
+          peso * precio_libra +
+          azul * precio_azulcosta +
+          calzado * precio_calzado +
+          otros * precio_otrosuniformes,
+          2
         )
-
         # 🔍 BUSCAR CLIENTE
         c.execute("SELECT correo FROM clientes WHERE nombre=?", (nombre,))
         resultado = c.fetchone()
